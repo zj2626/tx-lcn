@@ -53,8 +53,10 @@ public abstract class AbstractTxLogger implements TxLogger {
         if (Objects.isNull(logDbProperties)) {
             logDbProperties = SpringUtils.getBean(LogDbProperties.class);
         }
-        if (logDbProperties.isEnabled() && !logDbProperties.isOnlyError()) {
-            saveTxLog(groupId, unitId, tag, content, args);
+        if(logDbProperties!=null) {
+            if (logDbProperties.isEnabled() && !logDbProperties.isOnlyError()) {
+                saveTxLog(groupId, unitId, tag, content, args);
+            }
         }
         LOG.debug(content + " @group(" + groupId + ")", args);
     }
@@ -64,8 +66,10 @@ public abstract class AbstractTxLogger implements TxLogger {
         if (Objects.isNull(logDbProperties)) {
             logDbProperties = SpringUtils.getBean(LogDbProperties.class);
         }
-        if (logDbProperties.isEnabled() && logDbProperties.isOnlyError()) {
-            saveTxLog(groupId, unitId, tag, content, args);
+        if(logDbProperties!=null){
+            if (logDbProperties.isEnabled() && logDbProperties.isOnlyError()) {
+                saveTxLog(groupId, unitId, tag, content, args);
+            }
         }
         LOG.error(content + " @group(" + groupId + ")", args);
     }
