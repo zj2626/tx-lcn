@@ -72,6 +72,9 @@ public class DTXLogicWeaver {
         }
 
         // 本地事务调用
+        // todo 待优化 单元测试发现
+        //  1、这段代码永远执行不到,当DTXLocalContext存在时则直接return了业务
+        //  2、当刚创建DTXLocalContext对象时，getGroupId为null
         if (Objects.nonNull(dtxLocalContext.getGroupId())) {
             dtxLocalContext.setDestroy(false);
         }
