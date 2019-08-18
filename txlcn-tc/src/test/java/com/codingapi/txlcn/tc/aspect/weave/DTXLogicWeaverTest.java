@@ -1,6 +1,7 @@
 package com.codingapi.txlcn.tc.aspect.weave;
 
 import com.codingapi.txlcn.tc.aspect.DTXInfo;
+import com.codingapi.txlcn.tc.core.DTXLocalContext;
 import com.codingapi.txlcn.tc.core.DTXServiceExecutor;
 import com.codingapi.txlcn.tc.core.context.TCGlobalContext;
 import com.codingapi.txlcn.tc.core.context.TxContext;
@@ -39,8 +40,11 @@ public class DTXLogicWeaverTest {
     @Autowired
     private DTXLogicWeaver dtxLogicWeaver;
 
-    @Before
-    public void before(){
+
+
+    @Test
+    public void runTransaction_start() {
+        //Mock TxContext Start
         TxContext txContext = new TxContext();
         // 事务发起方判断
         txContext.setDtxStart(!TracingContext.tracing().hasGroup());
@@ -49,12 +53,42 @@ public class DTXLogicWeaverTest {
         }
         txContext.setGroupId(TracingContext.tracing().groupId());
         Mockito.when(tcGlobalContext.startTx()).thenReturn(txContext);
+
+
+        try {
+            dtxLogicWeaver.runTransaction(dtxInfo,()->{
+                return 0;
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
     }
 
 
     @Test
-    public void runTransaction() {
-        //DTXServiceExecutor
+    public void runTransaction_on() {
+        TxContext txContext = new TxContext();
+        txContext.setDtxStart(!TracingContext.tracing().hasGroup());
+        if (txContext.isDtxStart()) {
+            TracingContext.tracing().beginTransactionGroup();
+        }
+        txContext.setGroupId(TracingContext.tracing().groupId());
+        Mockito.when(tcGlobalContext.txContext()).thenReturn(txContext);
+        Mockito.when(tcGlobalContext.hasTxContext()).thenReturn(true);
+        try {
+            dtxLogicWeaver.runTransaction(dtxInfo,()->{
+                return 0;
+            });
+        } catch (Throwable throwable) {
+            throwable.printStackTrace();
+        }
+    }
+
+
+    @Test
+    public void runTransaction_return() {
+        DTXLocalContext.getOrNew();
+
         try {
             dtxLogicWeaver.runTransaction(dtxInfo,()->{
                 return 0;
